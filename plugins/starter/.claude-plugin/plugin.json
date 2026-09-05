@@ -1,0 +1,9 @@
+{
+  "name": "starter",
+  "description": "Free starter skills: SKILL.md authoring and a minimal MCP server scaffold.",
+  "version": "0.1.0",
+  "author": {
+    "name": "George O'Nair",
+    "url": "https://github.com/qingsongcui"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "george-onair-skills",
+  "owner": {
+    "name": "George O'Nair",
+    "url": "https://github.com/qingsongcui"
+  },
+  "metadata": {
+    "description": "Starter Agent Skills for Claude Code and Cursor."
+  },
+  "plugins": [
+    {
+      "name": "starter",
+      "source": "./plugins/starter",
+      "description": "Two free skills: author SKILL.md files that actually load, and scaffold a minimal MCP server."
+    }
+  ]
+}
