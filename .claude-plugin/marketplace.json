@@ -5,13 +5,13 @@
     "url": "https://github.com/qingsongcui"
   },
   "metadata": {
-    "description": "Starter Agent Skills for Claude Code and Cursor."
+    "description": "Starter Agent Skills: authoring, MCP scaffold, repo distillation preflight."
   },
   "plugins": [
     {
       "name": "starter",
       "source": "./plugins/starter",
-      "description": "Two free skills: author SKILL.md files that actually load, and scaffold a minimal MCP server."
+      "description": "Free skills: SKILL.md authoring, minimal MCP scaffold, repo license preflight."
     }
   ]
 }

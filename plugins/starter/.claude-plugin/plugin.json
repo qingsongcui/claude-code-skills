@@ -1,7 +1,7 @@
 {
   "name": "starter",
-  "description": "Free starter skills: SKILL.md authoring and a minimal MCP server scaffold.",
-  "version": "0.1.0",
+  "description": "Free starter skills: SKILL.md authoring, a minimal MCP server scaffold, and repo distillation preflight.",
+  "version": "0.2.0",
   "author": {
     "name": "George O'Nair",
     "url": "https://github.com/qingsongcui"

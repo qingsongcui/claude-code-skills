@@ -1,37 +1,46 @@
 # claude-code-skills
 
-Free starter [Agent Skills](https://code.claude.com/docs/en/skills) for Claude Code and Cursor. Written by **George O'Nair**.
+Free [Agent Skills](https://agentskills.io/specification) by **George O'Nair**.
 
-This repository is a [plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces). Two skills are included:
+This repository is a plugin marketplace. Three skills are included:
 
 | Skill | When to use it |
 |---|---|
 | `skill-authoring` | Your `SKILL.md` never loads, or you need a file the agent will actually auto-invoke. |
-| `mcp-server-scaffold` | You want the smallest MCP server (one tool, stdio) wired into Claude Code. |
+| `mcp-server-scaffold` | You want the smallest MCP server (one tool, stdio). |
+| `repo-distillation-preflight` | You want to know if a local repo is license-safe to turn into a skill. |
 
 ## Install
 
-In Claude Code:
+Claude Code:
 
 ```
 /plugin marketplace add qingsongcui/claude-code-skills
 /plugin install starter@george-onair-skills
 ```
 
-Then invoke `/skill-authoring` or `/mcp-server-scaffold`, or just describe the job in natural language.
-
-Manual copy (any Agent Skills client):
+Any Agent Skills client (Codex, Cursor, OpenCode, Claude Code):
 
 ```
 git clone https://github.com/qingsongcui/claude-code-skills.git
-# point your client at plugins/starter/skills/
+# copy plugins/starter/skills/ into your skills directory
 ```
 
-## What this is not
+Preflight CLI (Python 3, stdlib only):
 
-Not a dump of random prompt files. Each skill is a procedure with paths, failure modes, and an install check.
+```
+python3 plugins/starter/skills/repo-distillation-preflight/scripts/audit_repo_for_distillation.py --repo /path/to/local-repo
+```
 
-A larger production pack (evals, observability, security, multi-agent orchestration) is distributed separately. This repo stays the free starter.
+`DISTILL` means permissive license. `INTERNAL_ONLY` means copyleft — do not ship as a commercial skill.
+
+## Full pack
+
+The paid **Agentic Distiller** adds skill scaffolding, packaging validation, a one-shot pipeline, book-distiller templates, and a sample-todo fixture.
+
+https://whop.com/github-bad1/agentic-distiller
+
+It is not a one-click compiler that invents production workflows from GitHub. Agent runtime discovery is documented, not independently verified in that listing.
 
 ## License
 
