@@ -1,96 +1,121 @@
 ---
 name: skill-authoring
 description: >
-  Write, debug, and install Agent Skills (SKILL.md) for Claude Code, Cursor, and
-  other agents that follow the Agent Skills spec. Use when a skill does not load,
-  is never auto-invoked, lives in the wrong directory, or the user asks how to
-  author SKILL.md, plugin marketplaces, or custom commands.
+  Write, debug, and install Agent Skills (SKILL.md). Use when a skill is ignored,
+  never auto-invoked, has YAML/frontmatter errors, is in the wrong directory, or
+  when the user asks to author a skill, choose trigger words, distribute a Claude
+  Code plugin marketplace, or diagnose a SKILL.md loading failure.
+license: MIT
+compatibility: Works with Agent Skills-compatible hosts. Claude Code plugin examples require a current Claude Code installation.
 ---
 
 # Skill authoring
 
-Produce a skill that an agent will actually load. Most "my skill does nothing" bugs are layout, frontmatter, or description problems — not model quality.
+Produce a skill that a host can discover and an agent can select. Treat “the file exists” as a starting condition, not proof that the skill is usable.
 
-## Layout
+Official format reference: <https://agentskills.io/specification>.
 
-One skill = one directory + `SKILL.md`:
+## First decide the delivery mode
 
-```
+| Delivery mode | Put the skill here | Verify it with |
+|---|---|---|
+| Claude Code personal skill | `~/.claude/skills/<name>/SKILL.md` | Restart/reload, then invoke or ask for a matching task |
+| Claude Code project skill | `.claude/skills/<name>/SKILL.md` | Open the target project, then test in that project |
+| Claude Code plugin skill | `<plugin>/skills/<name>/SKILL.md` | Install the plugin, reload plugins, use `/<plugin>:<skill>` |
+| Another Agent Skills host | That host’s documented skill directory | Host-specific discovery check |
+
+Do not promise universal auto-discovery. Hosts may use different paths, activation rules, and tool permissions.
+
+## Build the smallest valid skill
+
+One skill is one directory with one required file:
+
+```text
 skill-name/
-  SKILL.md          # required
-  references/       # optional, load on demand
-  scripts/          # optional
+├── SKILL.md
+├── scripts/       # optional executable helpers
+├── references/    # optional, open only when needed
+└── assets/        # optional templates or static data
 ```
 
-Where it lives decides who sees it:
-
-| Scope | Path |
-|---|---|
-| Personal | `~/.claude/skills/<name>/SKILL.md` |
-| This repo | `.claude/skills/<name>/SKILL.md` |
-| Plugin | `<plugin>/skills/<name>/SKILL.md` |
-
-Directory name becomes `/skill-name`. Use kebab-case. Do not put the body in `.claude/commands/` unless you intentionally want a flat command file.
-
-## Frontmatter (the part that decides auto-invoke)
+The directory name must match the frontmatter `name`. Per the Agent Skills specification, `name` is lowercase letters, numbers, and hyphens; `description` must say both **what the skill does** and **when to use it**.
 
 ```yaml
 ---
-name: skill-name
+name: todo-cli-maintainer
 description: >
-  What it does, plus the user phrasing that should trigger it.
-  Include tool names, error symptoms, and "use when" language.
+  Maintain the sample todo CLI: add, list, and complete todos. Use when the user
+  asks to change the todo CLI in this repository. Do not use for other CLIs.
+license: MIT
 ---
 ```
 
-Rules:
+Why this activates better than `description: Helps with code`:
 
-- `description` is the trigger. If it only says "helper for tasks", the agent will not pick it.
-- Keep `SKILL.md` body short. Put long reference material in `references/` and tell the agent when to open it.
-- Do not duplicate the entire company wiki into one skill.
+1. **Artifact**: `todo CLI`
+2. **Trigger verbs**: `add`, `list`, `complete`
+3. **Boundary**: `this repository`, not every CLI
 
-## Authoring checklist
+## Authoring procedure
 
-1. Name the job in one sentence (example: "scaffold an MCP server that exposes one tool").
-2. List 5–10 user utterances that should load it. Put those in `description`.
-3. Write the procedure as numbered steps with exact file paths and commands.
-4. Add a "failure modes" section (wrong path, YAML broken, description too vague).
-5. Install, restart or reload, then invoke with `/skill-name` and with a natural-language prompt.
+1. State the job in one sentence. If it contains two unrelated jobs, split the skill.
+2. Write 5–10 phrases real users will say. Extract concrete nouns, verbs, symptoms, and exclusions into `description`.
+3. Put the shortest safe procedure in `SKILL.md`; move deep reference material into `references/` and link it with a relative path.
+4. Add one runnable verification command or observable result. “No error” is not enough.
+5. Add a failure mode table: wrong path, bad YAML, missing executable, overly broad trigger.
+6. Test two paths: explicit invocation and natural-language matching.
 
-## Debug a skill that never runs
+## Debug an ignored skill
 
-1. Confirm the file is exactly `SKILL.md` (not `skill.md` or `README.md`).
-2. Confirm it is not nested extra levels (`skills/foo/bar/SKILL.md` when the plugin expects `skills/foo/SKILL.md`).
-3. Parse the YAML. A missing closing `---` silently drops the skill.
-4. Read `description`. If it does not mention the words the user actually typed, rewrite it.
-5. In Claude Code, run `/skills` and check whether the name appears. If it does not, the file is not on a watched path.
-6. Personal vs project conflict: same name in `~/.claude/skills/` overrides the project copy.
+Follow this order; do not rewrite prompts before discovery works.
 
-## Plugin marketplace (optional distribution)
+1. **Discovery** — ask the host/agent to list skills matching your skill’s name or trigger words. If it cannot name the skill, this is a path/install problem.
+2. **Shape** — confirm exact casing: `skills/<name>/SKILL.md`, no accidental `skills/<name>/<name>/SKILL.md`.
+3. **Frontmatter** — confirm opening and closing `---`, valid YAML, matching `name`, and a description with artifact + verbs + boundary.
+4. **Scope collision** — temporarily rename or remove duplicate personal/project copies. Do not assume precedence is identical across hosts.
+5. **Activation** — use the exact trigger verb in a small prompt. Verify the agent names the skill or executes its stated verification.
+6. **Permissions** — if the skill is found but cannot run a command, inspect the host’s tool approval/sandbox setting rather than widening the skill description.
 
-To ship several skills as one install:
+| Symptom | Likely cause | Smallest fix |
+|---|---|---|
+| Skill is absent from discovery | Wrong directory or plugin not reloaded | Move it one level up; reload/restart |
+| Skill appears but is never selected | Description has no real trigger words | Add artifact, verbs, and boundary |
+| Skill selects for unrelated work | Description is too broad | Add exclusions and repository/domain terms |
+| Skill starts then fails | Referenced script/path is missing | Use relative paths; run the command directly |
+| Plugin command cannot be found | Expected un-namespaced command | Use `/<plugin-name>:<skill-name>` |
 
-```
+## Claude Code marketplace distribution
+
+Use this layout:
+
+```text
 repo/
-  .claude-plugin/marketplace.json
-  plugins/starter/.claude-plugin/plugin.json
-  plugins/starter/skills/<name>/SKILL.md
+├── .claude-plugin/marketplace.json
+└── plugins/
+    └── starter/
+        ├── .claude-plugin/plugin.json
+        └── skills/
+            └── skill-name/SKILL.md
 ```
 
-Users add the catalog, then install one plugin:
+Installation:
 
+```text
+/plugin marketplace add owner/repository
+/plugin install starter@marketplace-name
+/reload-plugins
 ```
-/plugin marketplace add qingsongcui/claude-code-skills
-/plugin install starter@george-onair-skills
-```
 
-Do not tell users to "copy a folder path into chat" as the primary install path.
+Then run `/<plugin-name>:<skill-name>` — for this repository, `/starter:skill-authoring`.
 
-## Output format when you write a skill for the user
+Every release must bump the plugin `version`; plugin installations are versioned and users otherwise may not receive the update. Source: <https://code.claude.com/docs/en/plugin-marketplaces>.
 
-Create the directory, write `SKILL.md`, and print:
+## Deliverable format
 
-- install path used
-- `/slash` name
-- one natural-language prompt that should auto-trigger it
-- one thing you deliberately left out of the body (and where it lives instead)
+When creating or repairing a skill, report:
+
+- exact install path;
+- skill name and plugin-qualified slash command when applicable;
+- one natural-language prompt that should select it;
+- the verification command/result;
+- an explicit limitation that is intentionally out of scope.

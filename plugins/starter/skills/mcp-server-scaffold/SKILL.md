@@ -1,63 +1,64 @@
 ---
 name: mcp-server-scaffold
 description: >
-  Scaffold a minimal MCP (Model Context Protocol) server in TypeScript or Python
-  with one tool, local stdio transport, and a smoke test. Use when the user wants
-  to create an MCP server, add a tool for Claude Code or Cursor, connect an agent
-  to a local script or API, or mentions MCP SDK, mcp.json, or Model Context Protocol.
+  Scaffold and smoke-test a minimal local stdio MCP server with one tool in
+  TypeScript or Python. Use when the user asks to build an MCP server, expose a
+  local tool to Claude Code or Cursor, configure mcp.json, add Model Context
+  Protocol tooling, debug a stdio MCP server, or connect an agent to a local API.
+license: MIT
+compatibility: TypeScript requires a current Node toolchain and the official MCP SDK. Python requires Python 3.10+ and MCP SDK 2.0+.
 ---
 
 # MCP server scaffold
 
-Build the smallest server that Claude Code / Cursor can attach: stdio transport, one tool, no framework soup.
+Build the smallest server that a host can attach to: **one tool, stdio transport, one observed success, one observed failure**. Do not start with OAuth, HTTP/SSE, database state, or a marketplace listing.
 
-Official protocol docs: https://modelcontextprotocol.io
+Use the current official build guide for SDK setup and API signatures: <https://modelcontextprotocol.io/docs/develop/build-server>.
 
-## Decide language
+## Select the language from the existing project
 
-- TypeScript if the user already has Node 18+ and will publish to npm later.
-- Python if the user already has a Python agent stack.
+| Existing project | Default | Do not assume |
+|---|---|---|
+| Node/TypeScript project | TypeScript | Node version or package manager — inspect its manifest |
+| Python project | Python | SDK version — inspect `pyproject.toml`/requirements |
+| Empty directory | Ask before generating | The user’s runtime, deployment, and packaging needs |
 
-Default to TypeScript unless the repo is clearly Python.
+Do not mix both SDKs into a single “starter.” One language, one executable entry point, one tool.
 
-## TypeScript scaffold
+## Server contract
 
-```
+1. Give the server a stable name and version.
+2. Register one tool with a narrow input schema.
+3. Return a structured, user-readable error for invalid input; do not expose a stack trace as tool output.
+4. Connect over stdio.
+5. Send all diagnostics to **stderr**. Stdout is the JSON-RPC transport and any log line corrupts it.
+
+The stdout rule is from the official MCP build guide: <https://modelcontextprotocol.io/docs/develop/build-server>.
+
+## Minimal project shape
+
+TypeScript:
+
+```text
 mcp-hello/
-  package.json
-  tsconfig.json
-  src/index.ts
+├── package.json
+├── tsconfig.json
+└── src/index.ts
 ```
 
-`package.json` essentials:
+Python:
 
-- `"type": "module"`
-- dependency `@modelcontextprotocol/sdk`
-- bin pointing at the compiled or tsx entry
-- start command that runs on stdio (no HTTP server)
-
-`src/index.ts` shape:
-
-1. Create an MCP server instance with a stable `name` and `version`.
-2. Register one tool (`hello`) with a JSON schema (`name: string`).
-3. Handler returns text, not a thrown stack trace.
-4. Connect via stdio transport.
-
-Do not add OAuth, SSE, or a marketplace listing until this tool answers once.
-
-## Python scaffold
-
-```
+```text
 mcp-hello/
-  pyproject.toml
-  src/mcp_hello/server.py
+├── pyproject.toml
+└── src/mcp_hello/server.py
 ```
 
-Use the official Python MCP SDK. Same contract: one tool, stdio, explicit error string on bad input.
+Keep transport configuration outside the server implementation. Do not make application code depend on a developer’s absolute local path.
 
-## Wire it into Claude Code
+## Host configuration
 
-Project `.mcp.json` (paths adjusted):
+Create `.mcp.json` only after the server can start by itself. Use the exact executable and arguments you just smoke-tested:
 
 ```json
 {
@@ -70,29 +71,31 @@ Project `.mcp.json` (paths adjusted):
 }
 ```
 
-Restart the session. Confirm the tool appears before writing a second tool.
+This is an example, not a command to cargo-cult. A Python server needs a Python/uv executable and its own tested path. Restart or reload the host after changing configuration, then confirm that **one tool appears** before adding another.
 
-## Smoke test
+## Smoke-test checklist
 
-1. Start the server the same way Claude will (`npx tsx src/index.ts` or `python -m ...`).
-2. It must not print logs to stdout (stdout is the protocol). Logs go to stderr.
-3. Call `hello` with `{"name":"world"}` and expect a single text result.
-4. Call it with missing `name` and expect a structured error, not a crash.
+1. Start the server with the same command configured in `.mcp.json`.
+2. Confirm stdout contains only protocol messages; diagnostics go to stderr.
+3. Call the happy path, for example `hello({"name":"world"})`; expect one text response.
+4. Call missing or malformed input; expect a readable structured error, not a crash/hang.
+5. Attach it through the target host and invoke the tool once.
 
 ## Failure modes
 
-| Symptom | Likely cause |
-|---|---|
-| Server shows up, tools empty | Tool not registered before connect |
-| Session hangs | Process waiting on stdin incorrectly, or extra stdout logs |
-| "command not found" | `command` in `.mcp.json` is a shell alias, not an executable |
-| Works in terminal, not in Claude | Different cwd or env than `.mcp.json` |
+| Symptom | Likely cause | Recovery |
+|---|---|---|
+| Host finds server but lists zero tools | Registration ran after transport connect, or schema registration failed | Register the tool before connecting; run the server with SDK diagnostics |
+| Host session hangs | Server writes logs to stdout or waits on stdin outside the transport | Move logs to stderr; use the SDK stdio transport only |
+| `command not found` | `.mcp.json` uses a shell alias or a different environment | Use an executable path/command that passed the direct smoke test |
+| Works in terminal but not host | Different cwd, env, or runtime version | Reproduce the host command exactly and record cwd/env |
+| Tool throws raw stack trace | Input validation or handler errors are uncaught | Return a controlled user-facing error and log details to stderr |
 
-## What to write for the user
+## Deliverable format
 
-Create the files in their repo (or a new folder they named). Print:
+Report:
 
-- how to run locally
-- the `.mcp.json` snippet
-- the first tool call to try
-- what was intentionally omitted (auth, hosting, multiple transports)
+- language and exact runtime/SDK version detected;
+- server entry path and `.mcp.json` snippet;
+- happy-path and invalid-input smoke-test output;
+- the one capability deliberately excluded until the first tool works.

@@ -5,13 +5,19 @@
     "url": "https://github.com/qingsongcui"
   },
   "metadata": {
-    "description": "Starter Agent Skills: authoring, MCP scaffold, repo distillation preflight."
+    "description": "Free local-first Agent Skills: SKILL.md authoring, one-tool MCP scaffolding, and license preflight.",
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "starter",
+      "displayName": "George O'Nair Skills Starter",
       "source": "./plugins/starter",
-      "description": "Free skills: SKILL.md authoring, minimal MCP scaffold, repo license preflight."
+      "description": "Free local-first skills for debugging SKILL.md discovery, scaffolding one stdio MCP tool, and preflighting repository license signals.",
+      "version": "0.3.0",
+      "repository": "https://github.com/qingsongcui/claude-code-skills",
+      "license": "MIT",
+      "keywords": ["agent-skills", "claude-code", "mcp", "skill-authoring", "license-preflight"]
     }
   ]
 }
