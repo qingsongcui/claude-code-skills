@@ -98,6 +98,8 @@ A restrained plan for one local stdio MCP tool. It starts with one tool and a sm
 
 A deterministic local license-and-layout audit. It does **not** clone repositories, copy source, certify quality, or authorize commercial reuse. It gives you a reasoned first gate before you turn any local codebase into an Agent Skill.
 
+> Need an evidence-first research workflow rather than another coding skill? See [Evidence-First Research](https://github.com/qingsongcui/evidence-first-research) — source tracking, uncertainty boundaries, and reviewed-answer validation.
+
 ## Free starter vs. Agentic Distiller
 
 The free starter is intentionally useful on its own:
