@@ -12,6 +12,14 @@ Free, small, local-first [Agent Skills](https://agentskills.io/specification) fo
 
 The repository is a Claude Code plugin marketplace and also a plain Agent Skills directory. The three skills are useful independently; none requires an API key, cloud service, or the paid product.
 
+## Want a deck, not just skills?
+
+A real end-to-end case: a 10-slide QBR deck for a fictional 40-seat SaaS, built from a one-paragraph brief — HTML → local render → density & style gates → **editable PPTX**.
+
+**→ [See the deck and the exact commands](examples/slide-engine-qbr-demo/)**
+
+The engine behind it is the paid **Autonomous Slide Deck Engine** ($39 one-time): <https://whop.com/github-bad1/autonomous-slide-deck-engine/>. It renders locally, enforces layout gates, and exports half-editable PPTX. It does **not** invent slides from a prompt — you or your agent author the HTML pages from a bundled master; the engine does the rendering, gating, and assembly. Verified on macOS arm64; rendering needs a one-time ~82 MB Chromium download.
+
 ## Five-minute quickstart
 
 The fastest way to get a useful answer is the repository preflight. Clone this repository, then audit a **local directory you own or are allowed to inspect**:
