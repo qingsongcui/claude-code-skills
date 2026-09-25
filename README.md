@@ -36,7 +36,7 @@ The script uses only the Python standard library. It prints JSON with one of the
 | Verdict | Meaning | Next action |
 |---|---|---|
 | `DISTILL` | Detected a permissive license. This is a license signal, not a quality or provenance approval. | Review the source and write a skill for work you are authorized to reuse. |
-| `INTERNAL_ONLY` | Detected GPL, LGPL, or AGPL terms. | Keep derivative skills internal; do not package them as commercial IP. |
+| `INTERNAL_ONLY` | Detected copyleft, source-available, or non-commercial terms (GPL, LGPL, AGPL, MPL, SSPL, RSALv2, BUSL/BSL, Commons Clause, PolyForm, CC-BY-NC). Restricted signals outrank permissive mentions in the same text. | Keep derivative skills internal; do not package them as commercial IP. |
 | `NEEDS_REVIEW` | License or repository evidence is unclear. | Stop and verify the license before distilling. |
 | `BLOCKED` | The supplied path is not a directory. | Correct `--repo`; the tool will not fabricate an output skill. |
 

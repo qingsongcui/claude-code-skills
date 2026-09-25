@@ -28,10 +28,25 @@ The program prints JSON. Capture that output in your decision record rather than
 
 | `distillation_verdict` | What the script observed | What to do next |
 |---|---|---|
-| `DISTILL` | A recognized permissive license signal (MIT, Apache-2.0, BSD, or ISC) | Check provenance, notices, file-level exceptions, and your authorization before reusing anything. |
-| `INTERNAL_ONLY` | GPL, LGPL, or AGPL terms detected | Do not package derived material as a commercial skill. Keep it internal or obtain qualified legal guidance. |
+| `DISTILL` | A recognized permissive license signal (MIT, Apache-2.0, BSD, or ISC, including SPDX identifiers) | Check provenance, notices, file-level exceptions, and your authorization before reusing anything. |
+| `INTERNAL_ONLY` | Copyleft, source-available, or non-commercial terms detected (GPL, LGPL, AGPL, MPL, SSPL, RSALv2, BUSL/BSL, Commons Clause, PolyForm, CC-BY-NC) | Do not package derived material as a commercial skill. Keep it internal or obtain qualified legal guidance. |
 | `NEEDS_REVIEW` | Missing/unknown license or incomplete evidence | Stop. Locate the authoritative license and scope before distilling. |
 | `BLOCKED` | `--repo` is not a directory | Correct the path. No generated artifact is a valid result here. |
+
+## License precedence is fail-closed
+
+Restricted signals outrank permissive ones found in the same text, so a
+repository licensed as RSALv2 + SSPLv1 + AGPLv3 (Redis Open Source) is reported
+`INTERNAL_ONLY` even though that LICENSE also references its historic BSD
+license. The script reads `LICENSE*`, `LICENCE*`, `COPYING*`, and `UNLICENSE*`
+files and `SPDX-License-Identifier` headers; an unrecognized identifier stays
+`NEEDS_REVIEW` and is never upgraded to `DISTILL`.
+
+`file_counts` ignores `.git`, dependency trees, caches, virtualenvs, and build
+output, and the same pruned tree is used for license discovery; every pruned
+directory is listed in `ignored_directories`. The report also carries
+`conversion_recommendation`. stdout stays pure JSON (`--no-hint` additionally
+suppresses the human hint that is written to stderr in a terminal).
 
 `DISTILL` does **not** mean:
 
@@ -59,9 +74,9 @@ Do not use a one-line green verdict as a substitute for this record.
 | Symptom | Meaning | Recovery |
 |---|---|---|
 | `BLOCKED` / `not a directory` | Wrong path or missing checkout | Use an existing local directory; this tool deliberately does not fetch GitHub. |
-| `NEEDS_REVIEW` / `unknown` | No recognized top-level license signal | Find the applicable license; do not guess from a README claim. |
-| `INTERNAL_ONLY` | Copyleft signal found | Exclude it from commercial distillation; preserve the finding in the record. |
-| `DISTILL` but a vendor file has a different notice | Top-level detection is insufficient | Manually inspect file-level headers and dependencies. |
+| `NEEDS_REVIEW` / `unknown` | No recognized license signal in a license file, an SPDX header, or `--metadata` | Find the applicable license; do not guess from a README claim. |
+| `INTERNAL_ONLY` | Copyleft, source-available, or non-commercial signal found (including one nested license file inside the scanned tree) | Exclude it from commercial distillation; preserve the finding in the record. |
+| `DISTILL` but a vendor file has a different notice | Pruned directories (`node_modules`, `vendor`, `dist`, …) are not license-scanned | Inspect file-level headers and dependency notices under `ignored_directories` manually. |
 | Invalid JSON input/output expectation | This tool only emits report JSON | Save the report; it is a preflight, not a scaffold generator. |
 
 ## Boundary

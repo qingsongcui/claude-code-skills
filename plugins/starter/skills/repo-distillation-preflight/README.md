@@ -29,10 +29,22 @@ The program prints JSON. Capture that output in your decision record rather than
 
 | `distillation_verdict` | What the script observed | What to do next |
 | --- | --- | --- |
-| `DISTILL` | Recognized permissive license signal (MIT, Apache-2.0, BSD, or ISC) | Still check provenance, notices, file-level exceptions, and your authorization before reusing anything. |
-| `INTERNAL_ONLY` | GPL, LGPL, or AGPL terms detected | Do not package derived material as a commercial skill. Keep it internal or get qualified legal guidance. |
+| `DISTILL` | Recognized permissive license signal (MIT, Apache-2.0, BSD, or ISC, including SPDX identifiers) | Still check provenance, notices, file-level exceptions, and your authorization before reusing anything. |
+| `INTERNAL_ONLY` | Copyleft, source-available, or non-commercial terms detected (GPL, LGPL, AGPL, MPL, SSPL, RSALv2, BUSL/BSL, Commons Clause, PolyForm, CC-BY-NC) | Do not package derived material as a commercial skill. Keep it internal or get qualified legal guidance. |
 | `NEEDS_REVIEW` | Missing/unknown license or incomplete evidence | Stop. Locate the authoritative license and scope before distilling. |
 | `BLOCKED` | `--repo` is not a directory | Correct the path. No generated artifact is valid here. |
+
+Detection is **fail-closed**: restricted terms outrank permissive mentions in the
+same document, so a repo that is tri-licensed RSALv2 + SSPLv1 + AGPLv3 (Redis
+Open Source) reports `INTERNAL_ONLY` even though its LICENSE also references the
+historic BSD grant. `LICENSE*`, `LICENCE*`, `COPYING*`, `UNLICENSE*`, and
+`SPDX-License-Identifier` headers are all read, and an unrecognized identifier
+stays `NEEDS_REVIEW` rather than becoming `DISTILL`.
+
+`file_counts` ignores `.git`, dependency trees, caches, virtualenvs, and build
+output; the same pruned tree drives license discovery, and everything skipped is
+listed under `ignored_directories`. The report also includes
+`conversion_recommendation`, and stdout stays pure JSON.
 
 `DISTILL` does **not** mean the repo is high quality, every file shares one license, authors authorized your commercial distribution, or an agent can turn it into a complete workflow.
 
@@ -69,9 +81,9 @@ Distiller does not replace this preflight. It does not host an agent, open PRs, 
 | Symptom | Meaning | Recovery |
 | --- | --- | --- |
 | `BLOCKED` / not a directory | Wrong path or missing checkout | Use an existing local directory; this tool deliberately does not fetch GitHub. |
-| `NEEDS_REVIEW` / unknown | No recognized top-level license signal | Find the applicable license; do not guess. |
-| `INTERNAL_ONLY` | Copyleft signal found | Exclude from commercial distillation; keep the finding in the record. |
-| `DISTILL` but a vendor file has another notice | Top-level detection is insufficient | Inspect file-level headers and dependencies manually. |
+| `NEEDS_REVIEW` / unknown | No recognized license signal in a license file, an SPDX header, or the `--metadata` key | Find the applicable license; do not guess. |
+| `INTERNAL_ONLY` | Copyleft, source-available, or non-commercial signal found (a single nested license file is enough) | Exclude from commercial distillation; keep the finding in the record. |
+| `DISTILL` but a vendor file has another notice | Pruned directories (`node_modules`, `vendor`, `dist`, …) are not license-scanned | Inspect file-level headers and dependency notices under `ignored_directories` manually. |
 
 ## About this skill (short)
 
