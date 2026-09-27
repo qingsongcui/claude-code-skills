@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repo-distillation-preflight"
+version = "0.1.0"
+description = "Fast, local-first AST and license preflight tool for packaging repositories into Agent Skills."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+  { name = "George O'Nair", email = "a985783827@gmail.com" }
+]
+keywords = ["agent-skills", "claude-code", "mcp", "licensing", "ast", "audit", "ai-workflows"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+Homepage = "https://george-onair.whop.site/shop/agentic-distiller"
+Documentation = "https://george-onair.whop.site/workflows/agents"
+Repository = "https://github.com/qingsongcui/claude-code-skills"
+
+[project.scripts]
+repo-preflight = "repo_preflight.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["repo_preflight*"]

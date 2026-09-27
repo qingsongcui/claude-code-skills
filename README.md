@@ -22,9 +22,14 @@ The engine behind it is the paid **Autonomous Slide Deck Engine** ($39 one-time)
 
 ## Five-minute quickstart
 
-The fastest way to get a useful answer is the repository preflight. Clone this repository, then audit a **local directory you own or are allowed to inspect**:
+The fastest way to get a useful answer is the repository preflight. Install directly with `pip` or clone:
 
 ```bash
+# Option 1: Direct install from GitHub
+pip install git+https://github.com/qingsongcui/claude-code-skills.git
+repo-preflight --repo /absolute/path/to/your-repo
+
+# Option 2: Clone and run without installation
 git clone https://github.com/qingsongcui/claude-code-skills.git
 cd claude-code-skills
 python3 plugins/starter/skills/repo-distillation-preflight/scripts/audit_repo_for_distillation.py \
