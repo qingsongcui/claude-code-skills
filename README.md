@@ -38,6 +38,8 @@ python3 plugins/starter/skills/repo-distillation-preflight/scripts/audit_repo_fo
 
 The script uses only the Python standard library. It prints JSON with one of these deliberate outcomes:
 
+Ran it or got stuck? [Share a sanitized verdict or blocker](https://github.com/qingsongcui/claude-code-skills/issues/new?template=preflight-feedback.md). The report includes local paths and file names, so do not post the full JSON or private source.
+
 | Verdict | Meaning | Next action |
 |---|---|---|
 | `DISTILL` | Detected a permissive license. This is a license signal, not a quality or provenance approval. | Review the source and write a skill for work you are authorized to reuse. |

@@ -25,6 +25,8 @@ python3 scripts/audit_repo_for_distillation.py --repo /absolute/path/to/reposito
 
 The program prints JSON. Capture that output in your decision record rather than paraphrasing it.
 
+If you get a verdict or get stuck, [share a sanitized run report](https://github.com/qingsongcui/claude-code-skills/issues/new?template=preflight-feedback.md). The JSON includes local paths and file names: do not post the full report, private source, or secrets in a public issue.
+
 ## How to read the verdict
 
 | `distillation_verdict` | What the script observed | What to do next |

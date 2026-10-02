@@ -69,3 +69,5 @@ guess which checkout you meant. Fix the path and rerun.
 answers whether a local repo has basic license and layout signals. The paid
 package adds a scaffold and structural checks. Neither tool automatically
 extracts business logic, scrubs secrets, or produces a production-ready Skill.
+
+If you try the free preflight on your own local repo, [share a sanitized verdict or blocker](https://github.com/qingsongcui/claude-code-skills/issues/new?template=preflight-feedback.md). Please do not post the full JSON, private paths, source, or secrets.
