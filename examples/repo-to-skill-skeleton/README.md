@@ -44,7 +44,8 @@ python3 skills/github-repo-skill-distiller/scripts/distill_local_repo.py \
 
 The CLI returned `"status": "PASS"` and generated a
 `field-lab-repo-maintainer/` directory with `SKILL.md`, a source evidence
-map, and script, template, and example stubs. Its generated
+map placeholder, and script, template, and example stubs. The evidence map
+only says `Fill this from repo inspection evidence.` Its generated
 `scripts/tool.py` still says:
 
 ```python
