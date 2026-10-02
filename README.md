@@ -115,6 +115,10 @@ A deterministic local license-and-layout audit. It does **not** clone repositori
 
 ## Free starter vs. Agentic Distiller
 
+See the [real repository walkthrough](examples/repo-to-skill-skeleton/) for
+the free verdict, the paid output, a missing-path failure, and the TODO that
+remains after the paid CLI reports `PASS`.
+
 The free starter is intentionally useful on its own:
 
 | Free here | Paid Agentic Distiller |
